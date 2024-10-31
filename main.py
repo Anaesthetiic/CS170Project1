@@ -1,6 +1,5 @@
 from heapq import heapify, heappush, heappop 
 # Positions where each number should be in during the goal state
-cPos0 = [2,2]
 cPos1 = [0,0]
 cPos2 = [0,1]
 cPos3 = [0,2]
@@ -217,8 +216,6 @@ def calcHn(state):
             tile = state[i][j]
             currentPos = (i, j)
             match(tile):
-                case 0:
-                    h += eDistance(currentPos, cPos0)
                 case 1:
                     h += eDistance(currentPos, cPos1)
                 case 2:
