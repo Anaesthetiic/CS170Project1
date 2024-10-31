@@ -1,4 +1,15 @@
-import heapq
+from heapq import heapify, heappush, heappop
+
+# Positions where each number should be in during the goal state
+cPos0 = [2,2]
+cPos1 = [0,0]
+cPos2 = [0,1]
+cPos3 = [0,2]
+cPos4 = [1,0]
+cPos5 = [1,1]
+cPos6 = [1,2]
+cPos7 = [2,0]
+cPos8 = [2,1]
 
 class EightPuzzle:
     def __init__(self, initial_state):
@@ -108,15 +119,91 @@ class EightPuzzle:
         for row in self.state:
             print(row)
         print("Is goal:", puzzle.is_goal())
+        
+    def createChildren(self):
+        children = []
+        if (self.can_swipe_right()):
+            newState = [list(row) for row in self.state]
+            newPuzzle = EightPuzzle(newState)
+            newPuzzle.swipe("right")
+            children.append(newPuzzle)
+        if (self.can_swipe_left()):
+            newState = [list(row) for row in self.state]
+            newPuzzle = EightPuzzle(newState)
+            newPuzzle.swipe("left")
+            children.append(newPuzzle)
+        if (self.can_swipe_down()):
+            newState = [list(row) for row in self.state]
+            newPuzzle = EightPuzzle(newState)
+            newPuzzle.swipe("down")
+            children.append(newPuzzle)
+        if (self.can_swipe_up()):
+            newState = [list(row) for row in self.state]
+            newPuzzle = EightPuzzle(newState)
+            newPuzzle.swipe("up")
+            children.append(newPuzzle)
+        return children
+
+class Node:
+    def __init__(self, puzzle: EightPuzzle, g=0, h=0):
+        self.puzzle = puzzle  
+        self.state = puzzle.state
+        self.g = g           
+        self.h = h            
+        self.f = g + h       
+
+    def __lt__(self, other):
+        return self.f < other.f
+
+    def __eq__(self, other):
+        return self.state == other.state
 
 # Search Functions
 
-def uniformCostSearch(state):
-    open_list = []      # priority queue
-    closed_list = []    # priority queue
-    
-    # initial state = state
-    heapq.heappush(open_list, (1, state))
+def uniformCostSearch(puzzle):
+    heap = []
+    g = 0
+    h = 0
+    heappush(heap, Node(puzzle,g=g, h=h))
+    visitedNodes = set()
+    firstExpansion = True
+    while heap:
+        currNode = heappop(heap)
+        if firstExpansion:
+            print("Expanding state")
+            currNode.puzzle.display()
+            print("\n")
+            firstExpansion = False
+        else:
+            print(f"The best state to expand with g(n) = {currNode.g:.2f} and h(n) = {currNode.h:.2f} is:")
+            currNode.puzzle.display()
+            print("Expanding this node...\n")
+        if currNode.puzzle.is_goal():
+            print("Goal state found")
+            return currNode
+        visitedNodes.add(tuple(map(tuple, currNode.state)))
+        children = currNode.puzzle.createChildren()
+        foundChildren = []
+        for child in children:
+            childStateTuple = tuple(map(tuple, child.state))
+            if childStateTuple in visitedNodes:
+                # print("Already visited this node: ")
+                # child.display()
+                # print("\n")
+                pass
+            else:
+                g = currNode.g + 1
+                h = 0
+                heappush(heap, Node(child, g=g, h=h))
+                foundChildren.append(child)
+        # functionality to print the children nodes that we found
+        # if foundChildren:
+        #     print("Found children:")
+        #     for i, child in enumerate(foundChildren):
+        #         print(f"Child {i + 1}:")
+        #         child.display()
+        #         print("\n")
+    return False 
     
 
 def aStarTile(state):
@@ -138,35 +225,35 @@ if __name__ == "__main__":
         puzzle.display()
                 
         # test swipe function. remove lines 133-159 after completing search functions
-        print("can swipe up? " + str(puzzle.can_swipe_up())) 
-        print("swipe up. expect to not be able to swipe up")
-        puzzle.swipe("up")
-        puzzle.display()
+        # print("can swipe up? " + str(puzzle.can_swipe_up())) 
+        # print("swipe up. expect to not be able to swipe up")
+        # puzzle.swipe("up")
+        # puzzle.display()
         
-        print("swipe right")
-        puzzle.swipe("right")
-        puzzle.display()
+        # print("swipe right")
+        # puzzle.swipe("right")
+        # puzzle.display()
         
-        print("swipe down")
-        puzzle.swipe("down")
-        puzzle.display()
+        # print("swipe down")
+        # puzzle.swipe("down")
+        # puzzle.display()
         
-        print("swipe up")
-        puzzle.swipe("up")
-        puzzle.display()
+        # print("swipe up")
+        # puzzle.swipe("up")
+        # puzzle.display()
         
-        print("swipe left. expect to be goal state")
-        puzzle.swipe("left")
-        puzzle.display()  
+        # print("swipe left. expect to be goal state")
+        # puzzle.swipe("left")
+        # puzzle.display()  
         
-        # test can_swipe_DIRECTION functions
-        print("can swipe right? " + str(puzzle.can_swipe_right()))
-        print("can swipe left? " + str(puzzle.can_swipe_left()))
-        print("can swipe down? " + str(puzzle.can_swipe_down()))
-        print("can swipe up? " + str(puzzle.can_swipe_up())) 
+        # # test can_swipe_DIRECTION functions
+        # print("can swipe right? " + str(puzzle.can_swipe_right()))
+        # print("can swipe left? " + str(puzzle.can_swipe_left()))
+        # print("can swipe down? " + str(puzzle.can_swipe_down()))
+        # print("can swipe up? " + str(puzzle.can_swipe_up())) 
         
         # Uniform Cost Solution
-        
+        uniformCostSearch(puzzle)
         
         
         # A* with the Misplaced Tile heuristic.
