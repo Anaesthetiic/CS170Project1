@@ -1,3 +1,17 @@
+from heapq import heapify, heappush, heappop 
+# Positions where each number should be in during the goal state
+cPos0 = [2,2]
+cPos1 = [0,0]
+cPos2 = [0,1]
+cPos3 = [0,2]
+cPos4 = [1,0]
+cPos5 = [1,1]
+cPos6 = [1,2]
+cPos7 = [2,0]
+cPos8 = [2,1]
+
+
+
 class EightPuzzle:
     def __init__(self, initial_state):
         self.state = initial_state      
@@ -106,6 +120,19 @@ class EightPuzzle:
             print(row)
         print("Is goal:", puzzle.is_goal())
 
+    def __init__(self, puzzle: EightPuzzle, g=0, h=0):
+        self.puzzle = puzzle  
+        self.state = puzzle.state
+        self.g = g           
+        self.h = h            
+        self.f = g + h       
+
+    def __lt__(self, other):
+        return self.f < other.f
+
+    def __eq__(self, other):
+        return self.state == other.state   
+
 # Search Functions
 
 def uniformCostSearch(state):
@@ -114,9 +141,42 @@ def uniformCostSearch(state):
 def aStarTile(state):
     pass
 
-def aStarEuclidean(state):
-    pass
+def aStarEuclidean(puzzle):
     
+    return False 
+def calcHn(state):
+    h = 0
+    for i in range(len(state)):
+        for j in range(len(state[i])):
+            tile = state[i][j]
+            currentPos = (i, j)
+            match(tile):
+                case 0:
+                    h += eDistance(currentPos, cPos0)
+                case 1:
+                    h += eDistance(currentPos, cPos1)
+                case 2:
+                    h += eDistance(currentPos, cPos2)
+                case 3:
+                    h += eDistance(currentPos, cPos3)
+                case 4:
+                    h += eDistance(currentPos, cPos4)
+                case 5:
+                    h += eDistance(currentPos, cPos5)
+                case 6:
+                    h += eDistance(currentPos, cPos6)
+                case 7:
+                    h += eDistance(currentPos, cPos7)
+                case 8:
+                    h += eDistance(currentPos, cPos8)
+    return h
+
+def eDistance(p1,p2):
+    return ((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
+
+
+
+
 
 if __name__ == "__main__":
     print("Welcome to XXX (change this to your student ID) 8 puzzle solver. Type “1” to use a default puzzle, or “2” to enter your own puzzle.")
@@ -128,34 +188,35 @@ if __name__ == "__main__":
         initial_state = [[1, 2, 3], [4, 5, 6], [7, 0, 8]]   # arbitrary initial state
         puzzle = EightPuzzle(initial_state)
         puzzle.display()
-                
+        
+        aStarEuclidean(puzzle)
         # test swipe function. remove lines 133-159 after completing search functions
-        print("can swipe up? " + str(puzzle.can_swipe_up())) 
-        print("swipe up. expect to not be able to swipe up")
-        puzzle.swipe("up")
-        puzzle.display()
+        # print("can swipe up? " + str(puzzle.can_swipe_up())) 
+        # print("swipe up. expect to not be able to swipe up")
+        # puzzle.swipe("up")
+        # puzzle.display()
         
-        print("swipe right")
-        puzzle.swipe("right")
-        puzzle.display()
+        # print("swipe right")
+        # puzzle.swipe("right")
+        # puzzle.display()
         
-        print("swipe down")
-        puzzle.swipe("down")
-        puzzle.display()
+        # print("swipe down")
+        # puzzle.swipe("down")
+        # puzzle.display()
         
-        print("swipe up")
-        puzzle.swipe("up")
-        puzzle.display()
+        # print("swipe up")
+        # puzzle.swipe("up")
+        # puzzle.display()
         
-        print("swipe left. expect to be goal state")
-        puzzle.swipe("left")
-        puzzle.display()  
+        # print("swipe left. expect to be goal state")
+        # puzzle.swipe("left")
+        # puzzle.display()  
         
         # test can_swipe_DIRECTION functions
-        print("can swipe right? " + str(puzzle.can_swipe_right()))
-        print("can swipe left? " + str(puzzle.can_swipe_left()))
-        print("can swipe down? " + str(puzzle.can_swipe_down()))
-        print("can swipe up? " + str(puzzle.can_swipe_up())) 
+        # print("can swipe right? " + str(puzzle.can_swipe_right()))
+        # print("can swipe left? " + str(puzzle.can_swipe_left()))
+        # print("can swipe down? " + str(puzzle.can_swipe_down()))
+        # print("can swipe up? " + str(puzzle.can_swipe_up())) 
         
         # Uniform Cost Solution
         
