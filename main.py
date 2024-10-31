@@ -119,7 +119,13 @@ class EightPuzzle:
         for row in self.state:
             print(row)
         print("Is goal:", puzzle.is_goal())
+    def createChildren(self):
+        children = []
+        if (self.can_swipe_left):
+            newPuzzle = EightPuzzle(self.state)
+            children.append(EightPuzzle(self.state).swipe("left"))
 
+class Node:
     def __init__(self, puzzle: EightPuzzle, g=0, h=0):
         self.puzzle = puzzle  
         self.state = puzzle.state
@@ -142,7 +148,19 @@ def aStarTile(state):
     pass
 
 def aStarEuclidean(puzzle):
-    
+    heap = []
+    g = 0
+    h = calcHn(puzzle.state)
+    heappush(heap, Node(puzzle.state,g=g, h=h))
+    visitedNodes = set()
+    while heap:
+        currNode = heappop(heap)
+        print(currNode.state)
+        if puzzle.is_goal(currNode):
+            print("Goal state found")
+            return currNode
+        visitedNodes.add(tuple(map(tuple, currNode.state)))
+        chlidren = puzzle.createChildren()
     return False 
 def calcHn(state):
     h = 0
