@@ -87,30 +87,26 @@ class EightPuzzle:
         if direction == "right":
             if (self.can_swipe_right() == False):
                 print("swipe right is not possible.")
-            while (col > 0 and col <= 2):
+            else:
                 self.state[row][col], self.state[row][col - 1] = self.state[row][col - 1], self.state[row][col]
-                col -= 1
-            
+
         elif direction == "left":
             if (self.can_swipe_left() == False): 
                 print("swipe left is not possible.")
-            while (col < len(self.state[0]) - 1):
+            else:
                 self.state[row][col], self.state[row][col + 1] = self.state[row][col + 1], self.state[row][col]
-                col += 1
-
+                
         elif direction == "down":
             if (self.can_swipe_down() == False):
                 print("swipe down is not possible.")
-            while (row > 0):
+            else:
                 self.state[row][col], self.state[row - 1][col] = self.state[row - 1][col], self.state[row][col]
-                row -= 1
                 
         elif direction == "up":
             if (self.can_swipe_up() == False):
                 print("swipe up is not possible.")
-            while (row < len(self.state) - 1):
+            else:
                 self.state[row][col], self.state[row + 1][col] = self.state[row + 1][col], self.state[row][col]
-                row += 1
                             
         else:
             print("Invalid direction.")
@@ -118,12 +114,31 @@ class EightPuzzle:
     def display(self):
         for row in self.state:
             print(row)
-        print("Is goal:", puzzle.is_goal())
+        print("Is goal:", self.is_goal())
+    
     def createChildren(self):
         children = []
-        if (self.can_swipe_left):
-            newPuzzle = EightPuzzle(self.state)
-            children.append(EightPuzzle(self.state).swipe("left"))
+        if (self.can_swipe_right()):
+            newState = [list(row) for row in self.state]
+            newPuzzle = EightPuzzle(newState)
+            newPuzzle.swipe("right")
+            children.append(newPuzzle)
+        if (self.can_swipe_left()):
+            newState = [list(row) for row in self.state]
+            newPuzzle = EightPuzzle(newState)
+            newPuzzle.swipe("left")
+            children.append(newPuzzle)
+        if (self.can_swipe_down()):
+            newState = [list(row) for row in self.state]
+            newPuzzle = EightPuzzle(newState)
+            newPuzzle.swipe("down")
+            children.append(newPuzzle)
+        if (self.can_swipe_up()):
+            newState = [list(row) for row in self.state]
+            newPuzzle = EightPuzzle(newState)
+            newPuzzle.swipe("up")
+            children.append(newPuzzle)
+        return children
 
 class Node:
     def __init__(self, puzzle: EightPuzzle, g=0, h=0):
@@ -151,16 +166,37 @@ def aStarEuclidean(puzzle):
     heap = []
     g = 0
     h = calcHn(puzzle.state)
-    heappush(heap, Node(puzzle.state,g=g, h=h))
+    heappush(heap, Node(puzzle,g=g, h=h))
     visitedNodes = set()
     while heap:
         currNode = heappop(heap)
-        print(currNode.state)
-        if puzzle.is_goal(currNode):
+        print(f"The best state to expand with g(n) = {currNode.g:.2f} and h(n) = {currNode.h:.2f} is:")
+        currNode.puzzle.display()
+        print("Expanding this node...\n")
+        if currNode.puzzle.is_goal():
             print("Goal state found")
             return currNode
         visitedNodes.add(tuple(map(tuple, currNode.state)))
-        chlidren = puzzle.createChildren()
+        children = currNode.puzzle.createChildren()
+        foundChildren = []
+        for child in children:
+            childStateTuple = tuple(map(tuple, child.state))
+            if childStateTuple in visitedNodes:
+                print("Already visited this node: ")
+                child.display()
+                print("\n")
+            else:
+                g = currNode.g + 1
+                h = calcHn(child.state)
+                heappush(heap, Node(child, g=g, h=h))
+                foundChildren.append(child)
+        # functionality to print the children nodes that we found
+        # if foundChildren:
+        #     print("Found children:")
+        #     for i, child in enumerate(foundChildren):
+        #         print(f"Child {i + 1}:")
+        #         child.display()
+        #         print("\n")
     return False 
 def calcHn(state):
     h = 0
@@ -205,9 +241,10 @@ if __name__ == "__main__":
         print("Initial State")
         initial_state = [[1, 2, 3], [4, 5, 6], [7, 0, 8]]   # arbitrary initial state
         puzzle = EightPuzzle(initial_state)
-        puzzle.display()
+        # puzzle.display()
+        # print("\n")
         
-        aStarEuclidean(puzzle)
+        solution = aStarEuclidean(puzzle)
         # test swipe function. remove lines 133-159 after completing search functions
         # print("can swipe up? " + str(puzzle.can_swipe_up())) 
         # print("swipe up. expect to not be able to swipe up")
@@ -263,8 +300,8 @@ if __name__ == "__main__":
         print("Initial State")
         initial_state = [row0, row1, row2]   # arbitrary initial state
         puzzle = EightPuzzle(initial_state)
-        puzzle.display()
-    
+        # puzzle.display()
+        # print("\n")
         # Uniform Cost Solution
         
         
@@ -274,5 +311,6 @@ if __name__ == "__main__":
         
         
         # A* with the Euclidean Distance heuristic
-    
+        solution = aStarEuclidean(puzzle)
+        
     
