@@ -163,22 +163,33 @@ def uniformCostSearch(puzzle):
     heap = []
     g = 0
     h = 0
+    
+    numExpandedNodes = 0
+    maxNodesInQueue = 0
+    goalNodeDepth = -1
     heappush(heap, Node(puzzle,g=g, h=h))
     visitedNodes = set()
     firstExpansion = True
     while heap:
+        if(len(heap) > maxNodesInQueue): maxNodesInQueue = len(heap)
         currNode = heappop(heap)
         if firstExpansion:
             print("Expanding state")
             currNode.puzzle.display()
             print("\n")
             firstExpansion = False
+            numExpandedNodes += 1       # stat count var
         else:
             print(f"The best state to expand with g(n) = {currNode.g:.2f} and h(n) = {currNode.h:.2f} is:")
             currNode.puzzle.display()
             print("Expanding this node...\n")
+            numExpandedNodes += 1       # stat count var
         if currNode.puzzle.is_goal():
             print("Goal state found")
+            goalNodeDepth = currNode.g
+            print("To solve this problem the search algorithm expanded a total of " + str(numExpandedNodes) + " nodes.")
+            print("The maximum number of nodes in the queue at any one time: " + str(maxNodesInQueue) + ".")
+            print("The depth of the goal node was " + str(goalNodeDepth) + ".")
             return currNode
         visitedNodes.add(tuple(map(tuple, currNode.state)))
         children = currNode.puzzle.createChildren()
@@ -202,6 +213,7 @@ def uniformCostSearch(puzzle):
         #         print(f"Child {i + 1}:")
         #         child.display()
         #         print("\n")
+
     return False 
     
 
@@ -293,12 +305,12 @@ if __name__ == "__main__":
     
     if(validated_int == 1):     # default puzzle
         # print("Initial State")
-        initial_state = [[1, 2, 3], [4, 5, 6], [7, 0, 8]]   # arbitrary initial state
+        initial_state = [[1, 2, 3], [0, 5, 6], [4, 7, 8]]   # arbitrary initial state
         puzzle = EightPuzzle(initial_state)
         # puzzle.display()
         # print("\n")
         
-        solution = aStarEuclidean(puzzle)
+        # solution = aStarEuclidean(puzzle)
         # test swipe function. remove lines 133-159 after completing search functions
         # print("can swipe up? " + str(puzzle.can_swipe_up())) 
         # print("swipe up. expect to not be able to swipe up")
