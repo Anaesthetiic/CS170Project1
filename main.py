@@ -1,3 +1,5 @@
+import heapq
+
 class EightPuzzle:
     def __init__(self, initial_state):
         self.state = initial_state      
@@ -5,6 +7,7 @@ class EightPuzzle:
         #   [0][0]  [0][1]  [0][2]
         #   [1][0]  [1][1]  [1][2]
         #   [2][0]  [2][1]  [2][2]
+        
         self.goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
 
     def findBlank(self):
@@ -109,7 +112,12 @@ class EightPuzzle:
 # Search Functions
 
 def uniformCostSearch(state):
-    pass
+    open_list = []      # priority queue
+    closed_list = []    # priority queue
+    
+    # initial state = state
+    heapq.heappush(open_list, (1, state))
+    
 
 def aStarTile(state):
     pass
