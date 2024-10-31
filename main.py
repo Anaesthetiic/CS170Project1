@@ -262,6 +262,7 @@ if __name__ == "__main__":
         # print("swipe up. expect to not be able to swipe up")
         # puzzle.swipe("up")
         # puzzle.display()
+
         
         # print("swipe right")
         # puzzle.swipe("right")
@@ -284,6 +285,16 @@ if __name__ == "__main__":
         # print("can swipe left? " + str(puzzle.can_swipe_left()))
         # print("can swipe down? " + str(puzzle.can_swipe_down()))
         # print("can swipe up? " + str(puzzle.can_swipe_up())) 
+        
+        # print("swipe up")
+        # puzzle.swipe("up")
+        # puzzle.display()
+        
+        # test can_swipe_DIRECTION functions
+        # print("can swipe right? " + str(puzzle.can_swipe_right()))
+        # print("can swipe left? " + str(puzzle.can_swipe_left()))
+        # print("can swipe down? " + str(puzzle.can_swipe_down()))
+        # print("can swipe up? " + str(puzzle.can_swipe_up()))
         
         # Uniform Cost Solution
         
