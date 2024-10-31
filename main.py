@@ -27,7 +27,7 @@ class EightPuzzle:
     def is_goal(self):
         return self.state == self.goal_state
 
-    def can_swipe_right(self):
+    def can_swipe_left(self):
         # Find the coordinates of the blank at current state (represented by 0)
         blankCoord = self.findBlank()
         row = blankCoord[0]
@@ -36,7 +36,7 @@ class EightPuzzle:
                 return False
         return True
     
-    def can_swipe_left(self):
+    def can_swipe_right(self):
         # Find the coordinates of the blank at current state (represented by 0)
         blankCoord = self.findBlank()
         row = blankCoord[0]
@@ -45,7 +45,7 @@ class EightPuzzle:
                 return False
         return True
     
-    def can_swipe_down(self):
+    def can_swipe_up(self):
         # Find the coordinates of the blank at current state (represented by 0)
         blankCoord = self.findBlank()
         row = blankCoord[0]
@@ -54,7 +54,7 @@ class EightPuzzle:
                 return False
         return True
     
-    def can_swipe_up(self):
+    def can_swipe_down(self):
         # Find the coordinates of the blank at current state (represented by 0)
         blankCoord = self.findBlank()
         row = blankCoord[0]
@@ -70,31 +70,31 @@ class EightPuzzle:
         row = blankCoord[0]
         col = blankCoord[1]
                 
-        if direction == "right":
-            if (self.can_swipe_right() == False):
-                print("swipe right is not possible.")
-            while (col > 0 and col <= 2):
+        if direction == "left":
+            if (self.can_swipe_left() == False):
+                print("swipe left is not possible.")
+            if (col > 0 and col <= 2):
                 self.state[row][col], self.state[row][col - 1] = self.state[row][col - 1], self.state[row][col]
                 col -= 1
             
-        elif direction == "left":
-            if (self.can_swipe_left() == False): 
-                print("swipe left is not possible.")
-            while (col < len(self.state[0]) - 1):
+        elif direction == "right":
+            if (self.can_swipe_right() == False): 
+                print("swipe right is not possible.")
+            elif (col < len(self.state[0]) - 1):
                 self.state[row][col], self.state[row][col + 1] = self.state[row][col + 1], self.state[row][col]
                 col += 1
 
-        elif direction == "down":
-            if (self.can_swipe_down() == False):
-                print("swipe down is not possible.")
-            while (row > 0):
-                self.state[row][col], self.state[row - 1][col] = self.state[row - 1][col], self.state[row][col]
-                row -= 1
-                
         elif direction == "up":
             if (self.can_swipe_up() == False):
                 print("swipe up is not possible.")
-            while (row < len(self.state) - 1):
+            elif (row > 0):
+                self.state[row][col], self.state[row - 1][col] = self.state[row - 1][col], self.state[row][col]
+                row -= 1
+                
+        elif direction == "down":
+            if (self.can_swipe_down() == False):
+                print("swipe down is not possible.")
+            elif (row < len(self.state) - 1):
                 self.state[row][col], self.state[row + 1][col] = self.state[row + 1][col], self.state[row][col]
                 row += 1
                             
@@ -131,7 +131,6 @@ if __name__ == "__main__":
                 
         # test swipe function. remove lines 133-159 after completing search functions
         print("can swipe up? " + str(puzzle.can_swipe_up())) 
-        print("swipe up. expect to not be able to swipe up")
         puzzle.swipe("up")
         puzzle.display()
         
@@ -139,14 +138,18 @@ if __name__ == "__main__":
         puzzle.swipe("right")
         puzzle.display()
         
+        print("swipe right. expect to not be able to swipe right")
+        puzzle.swipe("right")
+        puzzle.display()
+        
         print("swipe down")
         puzzle.swipe("down")
         puzzle.display()
         
-        print("swipe up")
-        puzzle.swipe("up")
+        print("swipe down. expect to not be able to swipe down")
+        puzzle.swipe("down")
         puzzle.display()
-        
+             
         print("swipe left. expect to be goal state")
         puzzle.swipe("left")
         puzzle.display()  
@@ -156,6 +159,16 @@ if __name__ == "__main__":
         print("can swipe left? " + str(puzzle.can_swipe_left()))
         print("can swipe down? " + str(puzzle.can_swipe_down()))
         print("can swipe up? " + str(puzzle.can_swipe_up())) 
+        
+        print("swipe up")
+        puzzle.swipe("up")
+        puzzle.display()
+        
+        # test can_swipe_DIRECTION functions
+        print("can swipe right? " + str(puzzle.can_swipe_right()))
+        print("can swipe left? " + str(puzzle.can_swipe_left()))
+        print("can swipe down? " + str(puzzle.can_swipe_down()))
+        print("can swipe up? " + str(puzzle.can_swipe_up()))
         
         # Uniform Cost Solution
         
