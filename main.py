@@ -41,7 +41,7 @@ class EightPuzzle:
     def is_goal(self):
         return self.state == self.goal_state
 
-    def can_swipe_right(self):
+    def can_swipe_left(self):
         # Find the coordinates of the blank at current state (represented by 0)
         blankCoord = self.findBlank()
         row = blankCoord[0]
@@ -50,7 +50,7 @@ class EightPuzzle:
                 return False
         return True
     
-    def can_swipe_left(self):
+    def can_swipe_right(self):
         # Find the coordinates of the blank at current state (represented by 0)
         blankCoord = self.findBlank()
         row = blankCoord[0]
@@ -59,7 +59,7 @@ class EightPuzzle:
                 return False
         return True
     
-    def can_swipe_down(self):
+    def can_swipe_up(self):
         # Find the coordinates of the blank at current state (represented by 0)
         blankCoord = self.findBlank()
         row = blankCoord[0]
@@ -68,7 +68,7 @@ class EightPuzzle:
                 return False
         return True
     
-    def can_swipe_up(self):
+    def can_swipe_down(self):
         # Find the coordinates of the blank at current state (represented by 0)
         blankCoord = self.findBlank()
         row = blankCoord[0]
@@ -84,29 +84,33 @@ class EightPuzzle:
         row = blankCoord[0]
         col = blankCoord[1]
                 
-        if direction == "right":
-            if (self.can_swipe_right() == False):
-                print("swipe right is not possible.")
-            else:
-                self.state[row][col], self.state[row][col - 1] = self.state[row][col - 1], self.state[row][col]
-
-        elif direction == "left":
-            if (self.can_swipe_left() == False): 
+        if direction == "left":
+            if (self.can_swipe_left() == False):
                 print("swipe left is not possible.")
-            else:
+            if (col > 0 and col <= 2):
+                self.state[row][col], self.state[row][col - 1] = self.state[row][col - 1], self.state[row][col]
+                col -= 1
+            
+        elif direction == "right":
+            if (self.can_swipe_right() == False): 
+                print("swipe right is not possible.")
+            elif (col < len(self.state[0]) - 1):
                 self.state[row][col], self.state[row][col + 1] = self.state[row][col + 1], self.state[row][col]
+                col += 1
+
+        elif direction == "up":
+            if (self.can_swipe_up() == False):
+                print("swipe up is not possible.")
+            elif (row > 0):
+                self.state[row][col], self.state[row - 1][col] = self.state[row - 1][col], self.state[row][col]
+                row -= 1
                 
         elif direction == "down":
             if (self.can_swipe_down() == False):
                 print("swipe down is not possible.")
-            else:
-                self.state[row][col], self.state[row - 1][col] = self.state[row - 1][col], self.state[row][col]
-                
-        elif direction == "up":
-            if (self.can_swipe_up() == False):
-                print("swipe up is not possible.")
-            else:
+            elif (row < len(self.state) - 1):
                 self.state[row][col], self.state[row + 1][col] = self.state[row + 1][col], self.state[row][col]
+                row += 1
                             
         else:
             print("Invalid direction.")
@@ -168,11 +172,18 @@ def aStarEuclidean(puzzle):
     h = calcHn(puzzle.state)
     heappush(heap, Node(puzzle,g=g, h=h))
     visitedNodes = set()
+    firstExpansion = True
     while heap:
         currNode = heappop(heap)
-        print(f"The best state to expand with g(n) = {currNode.g:.2f} and h(n) = {currNode.h:.2f} is:")
-        currNode.puzzle.display()
-        print("Expanding this node...\n")
+        if firstExpansion:
+            print("Expanding state")
+            currNode.puzzle.display()
+            print("\n")
+            firstExpansion = False
+        else:
+            print(f"The best state to expand with g(n) = {currNode.g:.2f} and h(n) = {currNode.h:.2f} is:")
+            currNode.puzzle.display()
+            print("Expanding this node...\n")
         if currNode.puzzle.is_goal():
             print("Goal state found")
             return currNode
@@ -182,9 +193,10 @@ def aStarEuclidean(puzzle):
         for child in children:
             childStateTuple = tuple(map(tuple, child.state))
             if childStateTuple in visitedNodes:
-                print("Already visited this node: ")
-                child.display()
-                print("\n")
+                # print("Already visited this node: ")
+                # child.display()
+                # print("\n")
+                pass
             else:
                 g = currNode.g + 1
                 h = calcHn(child.state)
@@ -238,7 +250,7 @@ if __name__ == "__main__":
     validated_int = int(inp[0])     # expect 1 or 2
     
     if(validated_int == 1):     # default puzzle
-        print("Initial State")
+        # print("Initial State")
         initial_state = [[1, 2, 3], [4, 5, 6], [7, 0, 8]]   # arbitrary initial state
         puzzle = EightPuzzle(initial_state)
         # puzzle.display()
@@ -297,7 +309,7 @@ if __name__ == "__main__":
         row1 = [int(x) for x in row1]
         row2 = [int(x) for x in row2]
         
-        print("Initial State")
+        # print("Initial State")
         initial_state = [row0, row1, row2]   # arbitrary initial state
         puzzle = EightPuzzle(initial_state)
         # puzzle.display()
