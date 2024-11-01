@@ -144,19 +144,34 @@ class EightPuzzle:
         return children
 
 class Node:
-    def __init__(self, puzzle: EightPuzzle, g=0, h=0):
+    def __init__(self, puzzle: EightPuzzle, parent = None, g=0, h=0):
         self.puzzle = puzzle  
         self.state = puzzle.state
         self.g = g           
         self.h = h            
-        self.f = g + h       
+        self.f = g + h
+        self.parent = parent
+
+    def is_root(self):
+        return self.parent is None
 
     def __lt__(self, other):
         return self.f < other.f
 
     def __eq__(self, other):
-        return self.state == other.state   
-
+        return self.state == other.state
+    
+    def __ne__(self, other):
+        return self.state != other.state
+    
+    def get_parent(self):
+        # if(self.parent == None):
+        #     return -1
+        return self.parent
+    
+    def get_g(self):
+        return self.g
+    
 # Search Functions
 
 def uniformCostSearch(puzzle):
@@ -167,12 +182,13 @@ def uniformCostSearch(puzzle):
     numExpandedNodes = 0
     maxNodesInQueue = 0
     goalNodeDepth = -1
-    heappush(heap, Node(puzzle,g=g, h=h))
+    heappush(heap, Node(puzzle, None, g=g, h=h))
     visitedNodes = set()
     firstExpansion = True
     while heap:
-        if(len(heap) > maxNodesInQueue): maxNodesInQueue = len(heap)
+        if(len(heap) > maxNodesInQueue): maxNodesInQueue = len(heap)        # stat count var
         currNode = heappop(heap)
+        print("parent: " + str(currNode.get_parent()))
         if firstExpansion:
             print("Expanding state")
             currNode.puzzle.display()
@@ -204,7 +220,7 @@ def uniformCostSearch(puzzle):
             else:
                 g = currNode.g + 1
                 h = 0
-                heappush(heap, Node(child, g=g, h=h))
+                heappush(heap, Node(child, currNode,g=g, h=h))
                 foundChildren.append(child)
         # functionality to print the children nodes that we found
         # if foundChildren:
@@ -271,8 +287,6 @@ def calcHn(state):
             tile = state[i][j]
             currentPos = (i, j)
             match(tile):
-                case 0:
-                    h += eDistance(currentPos, cPos0)
                 case 1:
                     h += eDistance(currentPos, cPos1)
                 case 2:
@@ -294,7 +308,18 @@ def calcHn(state):
 def eDistance(p1,p2):
     return ((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
 
-
+def printPath(solution):
+    path = []
+    n = solution
+    i = solution.get_g() + 1    # length = depth + root
+    while i > 0:
+        path.insert(0, n)
+        n = n.get_parent()
+        i -= 1
+    
+    print("\nFinal solution path:")
+    for elem in path:
+        elem.puzzle.display()
 
 
 
@@ -351,8 +376,11 @@ if __name__ == "__main__":
         # print("can swipe up? " + str(puzzle.can_swipe_up()))
         
         # Uniform Cost Solution
-        uniformCostSearch(puzzle)
-        
+        solution = uniformCostSearch(puzzle)
+        # Print path
+        printPath(solution)
+            
+            
         
         # A* with the Misplaced Tile heuristic.
         
@@ -379,15 +407,18 @@ if __name__ == "__main__":
         puzzle = EightPuzzle(initial_state)
         # puzzle.display()
         # print("\n")
-        # Uniform Cost Solution
         
+        print("Enter your choice of algorithm")
+        print("1. Uniform Cost Search")
+        print("2. A* with the Misplaced Tile heuristic.")
+        print("3. A* with the Euclidean distance heuristic")
+        choice = int(input("")[0])
         
-        
-        # A* with the Misplaced Tile heuristic.
-        
-        
-        
-        # A* with the Euclidean Distance heuristic
-        solution = aStarEuclidean(puzzle)
+        if(choice == 1): # Uniform Cost Solution
+            solution = uniformCostSearch(puzzle)
+        elif(choice == 2): # A* with the Misplaced Tile heuristic.
+            pass
+        elif(choice == 3): # A* with the Euclidean Distance heuristic
+            solution = aStarEuclidean(puzzle)
         
     
