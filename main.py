@@ -323,7 +323,6 @@ def aStarEuclidean(puzzle):
         if(len(heap) > maxNodesInQueue): maxNodesInQueue = len(heap)        # stat count var
 
         currNode = heappop(heap)
-        expandedNodes += 1
         if firstExpansion:
             print("Expanding state")
             currNode.puzzle.display()
