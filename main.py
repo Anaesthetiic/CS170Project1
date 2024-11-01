@@ -1,6 +1,5 @@
 from heapq import heapify, heappush, heappop 
 # Positions where each number should be in during the goal state
-cPos0 = [2,2]
 cPos1 = [0,0]
 cPos2 = [0,1]
 cPos3 = [0,2]
@@ -9,6 +8,9 @@ cPos5 = [1,1]
 cPos6 = [1,2]
 cPos7 = [2,0]
 cPos8 = [2,1]
+
+MAXNODES = 10000
+
 
 class EightPuzzle:
     def __init__(self, initial_state):
@@ -319,7 +321,9 @@ def aStarEuclidean(puzzle):
     firstExpansion = True
     while heap:
         if(len(heap) > maxNodesInQueue): maxNodesInQueue = len(heap)        # stat count var
+
         currNode = heappop(heap)
+        expandedNodes += 1
         if firstExpansion:
             print("Expanding state")
             currNode.puzzle.display()
@@ -360,6 +364,7 @@ def aStarEuclidean(puzzle):
         #         print(f"Child {i + 1}:")
         #         child.display()
         #         print("\n")
+    print("FAILED, expanded max nodes without solution, max nodes = {}".format(expandedNodes))
     return False 
 
 def calcHn(state):
