@@ -37,6 +37,15 @@ class EightPuzzle:
             print("Blank not included in state")
         return (row, col)
 
+    def get_goal_state(self):
+        return self.goal_state
+    
+    def get_state(self):
+        return self.state
+
+    def set_state(self, new_state):
+        self.state = new_state
+
     def is_goal(self):
         return self.state == self.goal_state
 
@@ -188,7 +197,6 @@ def uniformCostSearch(puzzle):
     while heap:
         if(len(heap) > maxNodesInQueue): maxNodesInQueue = len(heap)        # stat count var
         currNode = heappop(heap)
-        print("parent: " + str(currNode.get_parent()))
         if firstExpansion:
             print("Expanding state")
             currNode.puzzle.display()
@@ -232,30 +240,103 @@ def uniformCostSearch(puzzle):
 
     return False 
     
+def tileHeuristic(state, puzzle):
+    count = 0
+    for i in range(3):
+        for j in range(3):
+            # print(str(state[i][j]) + " == " + str(puzzle.get_goal_state()[i][j]))
+            if (state[i][j] == puzzle.get_goal_state()[i][j]): count += 1
+    return count
 
-def aStarTile(state):
-    pass
-
-def aStarEuclidean(puzzle):
+def aStarTile(puzzle):
     heap = []
     g = 0
-    h = calcHn(puzzle.state)
-    heappush(heap, Node(puzzle,g=g, h=h))
+    h = tileHeuristic(puzzle.get_state(), puzzle)
+    # print(tileHeuristic(puzzle.get_state(), puzzle))
+    
+    numExpandedNodes = 0
+    maxNodesInQueue = 0
+    goalNodeDepth = -1
+    heappush(heap, Node(puzzle, None, g=g, h=tileHeuristic(puzzle.get_state(), puzzle)))
     visitedNodes = set()
     firstExpansion = True
     while heap:
+        if(len(heap) > maxNodesInQueue): maxNodesInQueue = len(heap)        # stat count var
         currNode = heappop(heap)
         if firstExpansion:
             print("Expanding state")
             currNode.puzzle.display()
             print("\n")
             firstExpansion = False
+            numExpandedNodes += 1       # stat count var
         else:
             print(f"The best state to expand with g(n) = {currNode.g:.2f} and h(n) = {currNode.h:.2f} is:")
             currNode.puzzle.display()
             print("Expanding this node...\n")
+            numExpandedNodes += 1       # stat count var
         if currNode.puzzle.is_goal():
             print("Goal state found")
+            goalNodeDepth = currNode.g
+            print("To solve this problem the search algorithm expanded a total of " + str(numExpandedNodes) + " nodes.")
+            print("The maximum number of nodes in the queue at any one time: " + str(maxNodesInQueue) + ".")
+            print("The depth of the goal node was " + str(goalNodeDepth) + ".")
+            return currNode
+        visitedNodes.add(tuple(map(tuple, currNode.state)))
+        children = currNode.puzzle.createChildren()
+        foundChildren = []
+        for child in children:
+            childStateTuple = tuple(map(tuple, child.state))
+            if childStateTuple in visitedNodes:
+                # print("Already visited this node: ")
+                # child.display()
+                # print("\n")
+                pass
+            else:
+                g = currNode.g + 1
+                h = 0
+                heappush(heap, Node(child, currNode,g=g, h=tileHeuristic(currNode.puzzle.get_state(), puzzle)))
+                foundChildren.append(child)
+        # functionality to print the children nodes that we found
+        if foundChildren:
+            print("Found children:")
+            for i, child in enumerate(foundChildren):
+                print(f"Child {i + 1}:")
+                child.display()
+                print("\n")
+
+    return False
+    
+def aStarEuclidean(puzzle):
+    heap = []
+    g = 0
+    h = calcHn(puzzle.state)
+    
+    numExpandedNodes = 0
+    maxNodesInQueue = 0
+    goalNodeDepth = -1
+    heappush(heap, Node(puzzle, None, g=g, h=h))
+    visitedNodes = set()
+    firstExpansion = True
+    while heap:
+        if(len(heap) > maxNodesInQueue): maxNodesInQueue = len(heap)        # stat count var
+        currNode = heappop(heap)
+        if firstExpansion:
+            print("Expanding state")
+            currNode.puzzle.display()
+            print("\n")
+            firstExpansion = False
+            numExpandedNodes += 1       # stat count var
+        else:
+            print(f"The best state to expand with g(n) = {currNode.g:.2f} and h(n) = {currNode.h:.2f} is:")
+            currNode.puzzle.display()
+            print("Expanding this node...\n")
+            numExpandedNodes += 1       # stat count var
+        if currNode.puzzle.is_goal():
+            print("Goal state found")
+            goalNodeDepth = currNode.g
+            print("To solve this problem the search algorithm expanded a total of " + str(numExpandedNodes) + " nodes.")
+            print("The maximum number of nodes in the queue at any one time: " + str(maxNodesInQueue) + ".")
+            print("The depth of the goal node was " + str(goalNodeDepth) + ".")
             return currNode
         visitedNodes.add(tuple(map(tuple, currNode.state)))
         children = currNode.puzzle.createChildren()
@@ -270,7 +351,7 @@ def aStarEuclidean(puzzle):
             else:
                 g = currNode.g + 1
                 h = calcHn(child.state)
-                heappush(heap, Node(child, g=g, h=h))
+                heappush(heap, Node(child, currNode, g=g, h=h))
                 foundChildren.append(child)
         # functionality to print the children nodes that we found
         # if foundChildren:
@@ -280,6 +361,7 @@ def aStarEuclidean(puzzle):
         #         child.display()
         #         print("\n")
     return False 
+
 def calcHn(state):
     h = 0
     for i in range(len(state)):
@@ -330,12 +412,11 @@ if __name__ == "__main__":
     
     if(validated_int == 1):     # default puzzle
         # print("Initial State")
-        initial_state = [[1, 2, 3], [0, 5, 6], [4, 7, 8]]   # arbitrary initial state
+        initial_state = [[1, 2, 3], [4, 5, 6], [7, 0, 8]]   # arbitrary initial state
         puzzle = EightPuzzle(initial_state)
         # puzzle.display()
         # print("\n")
         
-        # solution = aStarEuclidean(puzzle)
         # test swipe function. remove lines 133-159 after completing search functions
         # print("can swipe up? " + str(puzzle.can_swipe_up())) 
         # print("swipe up. expect to not be able to swipe up")
@@ -375,18 +456,24 @@ if __name__ == "__main__":
         # print("can swipe down? " + str(puzzle.can_swipe_down()))
         # print("can swipe up? " + str(puzzle.can_swipe_up()))
         
-        # Uniform Cost Solution
-        solution = uniformCostSearch(puzzle)
+        print("Enter your choice of algorithm")
+        print("1. Uniform Cost Search")
+        print("2. A* with the Misplaced Tile heuristic.")
+        print("3. A* with the Euclidean distance heuristic")
+        choice = int(input("")[0])
+        
+        if(choice == 1): # Uniform Cost Solution
+            solution = uniformCostSearch(puzzle)
+            printPath(solution)
+        elif(choice == 2): # A* with the Misplaced Tile heuristic.
+            solution = aStarTile(puzzle)
+            printPath(solution)
+        elif(choice == 3): # A* with the Euclidean Distance heuristic
+            solution = aStarEuclidean(puzzle)
+            printPath(solution)
+        
         # Print path
-        printPath(solution)
-            
-            
         
-        # A* with the Misplaced Tile heuristic.
-        
-        
-        
-        # A* with the Euclidean Distance heuristic
         
     elif(validated_int == 2):   # self-designed puzzle
         print("Enter your puzzle, use a zero to represent the blank")
@@ -416,9 +503,13 @@ if __name__ == "__main__":
         
         if(choice == 1): # Uniform Cost Solution
             solution = uniformCostSearch(puzzle)
+            printPath(solution)
         elif(choice == 2): # A* with the Misplaced Tile heuristic.
-            pass
+            solution = aStarTile(puzzle)
+            printPath(solution)
         elif(choice == 3): # A* with the Euclidean Distance heuristic
             solution = aStarEuclidean(puzzle)
+            printPath(solution)
+        else: print("Invalid choice")
         
     
