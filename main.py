@@ -8,7 +8,7 @@ cPos5 = [1,1]
 cPos6 = [1,2]
 cPos7 = [2,0]
 cPos8 = [2,1]
-
+MAXNODES = 10000
 
 
 class EightPuzzle:
@@ -169,11 +169,13 @@ def aStarEuclidean(puzzle):
     heap = []
     g = 0
     h = calcHn(puzzle.state)
+    expandedNodes = 0
     heappush(heap, Node(puzzle,g=g, h=h))
     visitedNodes = set()
     firstExpansion = True
-    while heap:
+    while heap and expandedNodes < MAXNODES:
         currNode = heappop(heap)
+        expandedNodes += 1
         if firstExpansion:
             print("Expanding state")
             currNode.puzzle.display()
@@ -185,6 +187,7 @@ def aStarEuclidean(puzzle):
             print("Expanding this node...\n")
         if currNode.puzzle.is_goal():
             print("Goal state found")
+            print("Number of expanded nodes: {}".format(expandedNodes))
             return currNode
         visitedNodes.add(tuple(map(tuple, currNode.state)))
         children = currNode.puzzle.createChildren()
@@ -208,6 +211,7 @@ def aStarEuclidean(puzzle):
         #         print(f"Child {i + 1}:")
         #         child.display()
         #         print("\n")
+    print("FAILED, expanded max nodes without solution, max nodes = {}".format(expandedNodes))
     return False 
 def calcHn(state):
     h = 0
