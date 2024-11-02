@@ -239,7 +239,8 @@ def uniformCostSearch(puzzle):
         #         print(f"Child {i + 1}:")
         #         child.display()
         #         print("\n")
-
+    print("To solve this problem the search algorithm expanded a total of " + str(numExpandedNodes) + " nodes.")
+    print("The maximum number of nodes in the queue at any one time: " + str(maxNodesInQueue) + ".")
     return False 
     
 def tileHeuristic(state, puzzle):
@@ -299,13 +300,14 @@ def aStarTile(puzzle):
                 heappush(heap, Node(child, currNode,g=g, h=tileHeuristic(currNode.puzzle.get_state(), puzzle)))
                 foundChildren.append(child)
         # functionality to print the children nodes that we found
-        if foundChildren:
-            print("Found children:")
-            for i, child in enumerate(foundChildren):
-                print(f"Child {i + 1}:")
-                child.display()
-                print("\n")
-
+        # if foundChildren:
+        #     print("Found children:")
+        #     for i, child in enumerate(foundChildren):
+        #         print(f"Child {i + 1}:")
+        #         child.display()
+        #         print("\n")
+    print("To solve this problem the search algorithm expanded a total of " + str(numExpandedNodes) + " nodes.")
+    print("The maximum number of nodes in the queue at any one time: " + str(maxNodesInQueue) + ".")
     return False
     
 def aStarEuclidean(puzzle):
@@ -321,9 +323,7 @@ def aStarEuclidean(puzzle):
     firstExpansion = True
     while heap:
         if(len(heap) > maxNodesInQueue): maxNodesInQueue = len(heap)        # stat count var
-
         currNode = heappop(heap)
-        expandedNodes += 1
         if firstExpansion:
             print("Expanding state")
             currNode.puzzle.display()
@@ -364,7 +364,8 @@ def aStarEuclidean(puzzle):
         #         print(f"Child {i + 1}:")
         #         child.display()
         #         print("\n")
-    print("FAILED, expanded max nodes without solution, max nodes = {}".format(expandedNodes))
+    print("To solve this problem the search algorithm expanded a total of " + str(numExpandedNodes) + " nodes.")
+    print("The maximum number of nodes in the queue at any one time: " + str(maxNodesInQueue) + ".")
     return False 
 
 def calcHn(state):
@@ -517,4 +518,54 @@ if __name__ == "__main__":
             printPath(solution)
         else: print("Invalid choice")
         
-    
+    elif(validated_int == 3):
+        print("Which difficulty level would you like")
+        choice = int(input("")[0])
+        match(choice):
+            case 0:
+                state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+                puzzle = EightPuzzle(state)
+            case 1:
+                state = [[1, 2, 3], [4, 5, 6], [7, 0, 8]]
+                puzzle = EightPuzzle(state)
+            case 2:
+                state = [[1, 2, 0], [4, 5, 3], [7, 8, 6]]
+                puzzle = EightPuzzle(state)
+            case 3:
+                state = [[0, 1, 2], [4, 5, 3], [7, 8, 6]]
+                puzzle = EightPuzzle(state)
+            case 4:
+                state = [[8, 7, 1], [6, 0, 2], [5, 4, 3]]
+                puzzle = EightPuzzle(state)
+            case 5:
+                state = [[1, 2, 3], [4, 5, 6], [8, 7, 0]]
+                puzzle = EightPuzzle(state)
+            case _:
+                print("Error: Invalid input. Please enter a number from 0 to 5.")
+        
+
+        print("Enter your choice of algorithm")
+        print("1. Uniform Cost Search")
+        print("2. A* with the Misplaced Tile heuristic.")
+        print("3. A* with the Euclidean distance heuristic")
+        choice = int(input("")[0])
+        
+        if(choice == 1): # Uniform Cost Solution
+            solution = uniformCostSearch(puzzle)
+            if (solution): 
+                printPath(solution)
+            else:
+                print("No solution")
+        elif(choice == 2): # A* with the Misplaced Tile heuristic.
+            solution = aStarTile(puzzle)
+            if (solution): 
+                printPath(solution)
+            else:
+                print("No solution")
+        elif(choice == 3): # A* with the Euclidean Distance heuristic
+            solution = aStarEuclidean(puzzle)
+            if (solution): 
+                printPath(solution)
+            else:
+                print("No solution")
+        else: print("Invalid choice")
