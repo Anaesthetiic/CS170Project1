@@ -247,7 +247,7 @@ def tileHeuristic(state, puzzle):
     for i in range(3):
         for j in range(3):
             # print(str(state[i][j]) + " == " + str(puzzle.get_goal_state()[i][j]))
-            if (state[i][j] == puzzle.get_goal_state()[i][j]): count += 1
+            if (state[i][j] != puzzle.get_goal_state()[i][j]): count += 1
     return count
 
 def aStarTile(puzzle):
